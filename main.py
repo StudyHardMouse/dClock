@@ -2,13 +2,10 @@ from machine import I2C, Pin
 from ssd1306 import SSD1306_I2C
 import network
 import machine
-import time
 from machine import RTC
 import urequests
 import ntptime
 import utime
-
-
 
 fonts= {
     "气": [0x20,0x3F,0x40,0xBF,0x00,0x7F,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xE0,0x00,0xC0,0x00,0x80,0x80,0x80,0x80,0xA0,0x60,0x20],
@@ -52,16 +49,16 @@ sta_if.active(True)
 sta_if.scan()
 oled.text('Wifi Connecting', 0, 0)
 oled.show()
-sta_if.connect('张', 'zhang13939088771')
+sta_if.connect('WLAN名', '密码')
 utime.sleep(5)
 if sta_if.ifconfig()[0] == '0.0.0.0':
-  sta_if.connect('小金豆', 'chinausa')
+  sta_if.connect('热点名称', '密码')
   utime.sleep(5)
 print(sta_if.ifconfig()[0])
 def link():
   try:
     ntptime.NTP_DELTA = 3155644800
-    # ntptime.host = 'ntp1.aliyun.com'
+    ntptime.host = 'ntp1.aliyun.com'
     ntptime.settime()
     rep = urequests.get('https://api.seniverse.com/v3/weather/now.json?key=SSlw_VaRGD6k1B2mw&location=zhengzhou&language=zh-Hans&unit=c')
     rep.encoding = 'utf-8'
@@ -75,10 +72,8 @@ def link():
             byte_data = fonts[k]
             # print(fonts[k], "offset=", offset_)
             for y in range(0, ch_size):
-                # 进制转换、补全
                 a_ = '{:0>8b}'.format(byte_data[y])
                 b_ = '{:0>8b}'.format(byte_data[y+ch_size])
-                # 绘制像素点 （按取模软件的行列式方式）
                 for x in range(0, 8):
                     oled.pixel(x_axis + offset_ + x, y + y_axis, int(a_[x]))
                     oled.pixel(x_axis + offset_ + x + 8, y + y_axis, int(b_[x]))
@@ -88,19 +83,13 @@ def link():
       t = localtime_now
       oled.fill(0)  
       print(t)
-      if (t[3]+8) // 24 >= 1:
-        oled.text('{}-{}-{}'.format(t[0], t[1], t[2]+1), 30, 35)
-        t6 = t[6] + 1
-      elif (t[3]+8) // 24 < 1:
-        oled.text('{}-{}-{}'.format(t[0], t[1], t[2]), 30, 35)
-        t6 = t[6]
+      oled.text('{}-{}-{}'.format(t[0], t[1], t[2]), 30, 35)
       oled.text('{}:{}:{}'.format((t[3])%24, t[4], t[5]), 30, 45)
       chinese('新密', 0, 0)
       chinese(rep.json()['results'][0]['now']['text'], 0, 15)
       oled.text(rep.json()['results'][0]['now']['temperature'], 60, 18)
       chinese('度', 80, 15)
       chinese('星期', 60, 0)
-      #if t6 <= 6:
       oled.text('{}'.format(t[6]+1), 90, 3)
       '''elif t6 == 7:
         oled.text('1', 90, 3)
