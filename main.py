@@ -60,7 +60,7 @@ def link():
     ntptime.NTP_DELTA = 3155644800
     ntptime.host = 'ntp1.aliyun.com'
     ntptime.settime()
-    rep = urequests.get('https://api.seniverse.com/v3/weather/now.json?key=SSlw_VaRGD6k1B2mw&location=zhengzhou&language=zh-Hans&unit=c')
+    rep = urequests.get('api链接')
     rep.encoding = 'utf-8'
     print('返回结果:%s'%rep.json())
     print('天气：%s'%rep.json()['results'][0]['now']['text'])      
